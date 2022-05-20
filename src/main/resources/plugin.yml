@@ -1,0 +1,4 @@
+name: TntAutoIgnite
+version: '${project.version}'
+main: com.hb.tntautoignite.TntAutoIgnite
+api-version: 1.18
