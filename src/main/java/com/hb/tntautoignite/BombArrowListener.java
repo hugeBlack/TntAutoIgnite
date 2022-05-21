@@ -32,6 +32,7 @@ public class BombArrowListener implements Listener {
     @EventHandler
     public void onLand(ProjectileHitEvent e){
         if(!bombSet.contains(e.getEntity())) return;
+        e.setCancelled(true);
         summonTnt(e.getEntity());
         bombSet.remove(e.getEntity());
         e.getEntity().remove();
