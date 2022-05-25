@@ -23,13 +23,9 @@ public final class TntAutoIgnite extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new BombArrowListener(),this);
         BukkitScheduler scheduler = Bukkit.getScheduler();
         scheduler.scheduleSyncRepeatingTask(this, () -> {
-            Entity lastOne = null;
             for(Entity bombArrow: bombArrowSet){
-
-                if(lastOne!=null) bombArrowSet.remove(lastOne);
                 bombArrow.getWorld().spawnParticle(Particle.SMOKE_LARGE,bombArrow.getLocation(),100,0,0,0,0,null);
             }
-            if(lastOne!=null) bombArrowSet.remove(lastOne);
         }, 0L, 1L);
     }
 

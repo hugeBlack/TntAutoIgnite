@@ -9,6 +9,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,12 +40,10 @@ public class BombArrowListener implements Listener {
         tntSet.add(nmsTNT);
         nmsTNT.setFuseTicks(15);
         nmsTNT.setSource(Objects.requireNonNull((Entity)arrow.getShooter()));
-        Entity lastOne = null;
-        for(Entity tnt:tntSet){
-            if(lastOne!=null) tntSet.remove(lastOne);
-            if(tnt.isDead()) lastOne = tnt;
+        Iterator it = tntSet.iterator();
+        while(it.hasNext()){
+            if(((Entity) it.next()).isDead()) it.remove();
         }
-        if(lastOne!=null) tntSet.remove(lastOne);
     }
     /*@EventHandler(priority = EventPriority.LOW)
     public void onPlayerBucket(PlayerBucketFillEvent e){
