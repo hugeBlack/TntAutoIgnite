@@ -2,3 +2,9 @@ name: TntAutoIgnite
 version: '${project.version}'
 main: com.hb.tntautoignite.TntAutoIgnite
 api-version: 1.18
+
+commands:
+  tai:
+    description: Reloads config
+    usage: /tai
+    permission: tntautoignite.reload

@@ -1,6 +1,7 @@
 package com.hb.tntautoignite;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Particle;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftTNTPrimed;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -8,20 +9,51 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.scheduler.BukkitScheduler;
 
-import java.util.Iterator;
-import java.util.Objects;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.hb.tntautoignite.TntAutoIgnite.bombArrowSet;
-import static com.hb.tntautoignite.TntAutoIgnite.tntSet;
 
 public class BombArrowListener implements Listener {
+
+    public HashSet<Entity> bombArrowSet = new HashSet<>();
+    public HashSet<Entity> tntSet = new HashSet<>();
+    public HashMap<Entity,Integer> tickMapPlayerCanShoot = new HashMap<>();
+    public int totalTick = 0;
+    {
+        Bukkit.getLogger().log(Level.WARNING,"Listener attached.");
+        BukkitScheduler scheduler = Bukkit.getScheduler();
+        scheduler.scheduleSyncRepeatingTask(TntAutoIgnite.thePlugin, () -> {
+            totalTick++;
+            for(Entity bombArrow: bombArrowSet){
+                bombArrow.getWorld().spawnParticle(Particle.SMOKE_LARGE,bombArrow.getLocation(),100,0,0,0,0,null);
+            }
+        }, 0L, 1L);
+    }
+
     @EventHandler
     public void onShoot(EntityShootBowEvent e){
-        if(!HBItem.isItem("bomb_arrow",e.getConsumable())) return;
-        TntAutoIgnite.bombArrowSet.add(e.getProjectile());
+        if(!(e.getEntity() instanceof Player)) return;
+        boolean isLobbyArrow = HBItem.isItem("bomb_arrow_lobby",e.getConsumable());
+        boolean isWarArrow = HBItem.isItem("bomb_arrow",e.getConsumable());
+        if(!isLobbyArrow && !isWarArrow) return;
+        Iterator<Map.Entry<Entity,Integer>> it = tickMapPlayerCanShoot.entrySet().iterator();
+        while(it.hasNext()){
+            Map.Entry<Entity,Integer> entry = it.next();
+            if(entry.getValue()<=totalTick) it.remove();
+        }
+        if(isWarArrow){
+            if(tickMapPlayerCanShoot.containsKey(e.getEntity()) && tickMapPlayerCanShoot.get(e.getEntity())>totalTick){
+                ((Player)e.getEntity()).sendMessage("§cTnt Arrow have not cooled down yet. Wait "+((double)(tickMapPlayerCanShoot.get(e.getEntity())-totalTick))/20+"s.");
+                e.setCancelled(true);
+                ((Player)e.getEntity()).updateInventory();
+                return;
+            }
+            tickMapPlayerCanShoot.put(e.getEntity(),totalTick+TntAutoIgnite.arrowTntCoolDownTicks);
+        }
+        bombArrowSet.add(e.getProjectile());
     }
 
     @EventHandler
@@ -38,30 +70,18 @@ public class BombArrowListener implements Listener {
         Entity newTnt = arrow.getWorld().spawnEntity(arrow.getLocation(), EntityType.PRIMED_TNT);
         CraftTNTPrimed nmsTNT = (CraftTNTPrimed) newTnt;
         tntSet.add(nmsTNT);
-        nmsTNT.setFuseTicks(15);
+        nmsTNT.setFuseTicks(TntAutoIgnite.arrowTntFuseTicks);
         nmsTNT.setSource(Objects.requireNonNull((Entity)arrow.getShooter()));
         Iterator it = tntSet.iterator();
         while(it.hasNext()){
             if(((Entity) it.next()).isDead()) it.remove();
         }
     }
-    /*@EventHandler(priority = EventPriority.LOW)
-    public void onPlayerBucket(PlayerBucketFillEvent e){
-        ItemStack is = HBItem.getBukkitStack(Material.ARROW,"bomb_arrow",64);
-        ItemMeta im = is.getItemMeta();
-        im.setDisplayName("§r§e§lRocket");
-        List<String> lore = new ArrayList<>();
-        lore.add("§r§7Launch with a bow");
-        im.setLore(lore);
-        is.setItemMeta(im);
-        e.getPlayer().getInventory().addItem(is);
-        Bukkit.getLogger().log(Level.WARNING,"NMSL");
-    }*/
 
     @EventHandler
     public void onDamage(EntityDamageByEntityEvent e){
         if(tntSet.contains(e.getDamager()) && e.getEntity() instanceof Player){
-            e.setDamage(e.getDamage()/4);
+            e.setDamage(e.getDamage()*TntAutoIgnite.arrowTntDamageMultiplier);
         }
     }
 }
