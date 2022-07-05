@@ -1,14 +1,19 @@
 package com.hb.tntautoignite;
 
+import net.minecraft.world.entity.projectile.ThrownTrident;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftTNTPrimed;
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftTrident;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import java.util.*;
@@ -53,6 +58,9 @@ public class BombArrowListener implements Listener {
             }
             tickMapPlayerCanShoot.put(e.getEntity(),totalTick+TntAutoIgnite.arrowTntCoolDownTicks);
         }
+        if(e.getBow().containsEnchantment(Enchantment.ARROW_INFINITE)){
+            e.getConsumable().setAmount(e.getConsumable().getAmount()-1);
+        }
         bombArrowSet.add(e.getProjectile());
     }
 
@@ -82,6 +90,18 @@ public class BombArrowListener implements Listener {
     public void onDamage(EntityDamageByEntityEvent e){
         if(tntSet.contains(e.getDamager()) && e.getEntity() instanceof Player){
             e.setDamage(e.getDamage()*TntAutoIgnite.arrowTntDamageMultiplier);
+        }
+    }
+
+
+    //Trident thrown event
+    @EventHandler
+    public void onTridentHit(ProjectileHitEvent e) {
+        if(!e.getEntityType().equals(EntityType.TRIDENT)) return;
+        ThrownTrident tridentEntity = ((CraftTrident) e.getEntity()).getHandle();
+        if (e.getEntity().getShooter() instanceof Player && e.getEntityType().equals(EntityType.TRIDENT) && tridentEntity.isChanneling() && !e.getEntity().getWorld().isThundering()) {
+            Player plr = (Player)e.getEntity().getShooter();
+            plr.getWorld().strikeLightning(e.getEntity().getLocation());
         }
     }
 }
