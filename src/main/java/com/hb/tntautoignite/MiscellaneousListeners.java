@@ -64,7 +64,7 @@ public class MiscellaneousListeners implements Listener {
             if(newEntityType == null) return;
             e.setCancelled(true);
             if(e.getPlayer().getGameMode() != GameMode.CREATIVE) e.getItem().setAmount(e.getItem().getAmount()-1);
-            Entity entity = e.getPlayer().getWorld().spawnEntity(e.getClickedBlock().getLocation().add(0,1,0), newEntityType);
+            Entity entity = e.getPlayer().getWorld().spawnEntity(e.getClickedBlock().getLocation().add(0.5,1,0.5), newEntityType);
             ItemStack hatIS = new ItemStack(Material.LEATHER_HELMET);
             if(shouldAddHat) ((LivingEntity) entity).getEquipment().setHelmet(hatIS);
             entityPlayerHashMap.put(entity,e.getPlayer());
