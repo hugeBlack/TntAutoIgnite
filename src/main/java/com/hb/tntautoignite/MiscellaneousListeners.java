@@ -1,6 +1,7 @@
 package com.hb.tntautoignite;
 
 import net.minecraft.world.entity.projectile.ThrownTrident;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftTrident;
@@ -9,12 +10,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
+import java.util.logging.Level;
 
 public class MiscellaneousListeners implements Listener {
 
@@ -87,9 +90,16 @@ public class MiscellaneousListeners implements Listener {
         if(p == e.getEntity()) {
             e.setCancelled(true);
         }else{
-            double damage = e.getDamage();
-            e.setCancelled(true);
-            ((Player) e.getEntity()).damage(damage,p);
+            if(e.getDamager() instanceof Projectile){
+                ((Projectile)e.getDamager()).setShooter(p);
+            }else{
+                e.setCancelled(true);
+                EntityDamageByEntityEvent newEvent = new EntityDamageByEntityEvent(p,e.getEntity(),e.getCause(),e.getDamage());
+                e.getEntity().setLastDamageCause(newEvent);
+                Bukkit.getServer().getPluginManager().callEvent(newEvent);
+            }
+
+            //((Player) e.getEntity()).damage(damage,p);
         }
     }
 }
