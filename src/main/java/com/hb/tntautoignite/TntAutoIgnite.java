@@ -16,6 +16,7 @@ public final class TntAutoIgnite extends JavaPlugin {
         thePlugin = this;
         Bukkit.getPluginManager().registerEvents(new PlaceTntListener(), this);
         Bukkit.getPluginManager().registerEvents(new BombArrowListener(),this);
+        Bukkit.getPluginManager().registerEvents(new MiscellaneousListeners(),this);
         loadConfig();
         this.getCommand("tai").setExecutor(new TntAutoIgniteCommand());
     }

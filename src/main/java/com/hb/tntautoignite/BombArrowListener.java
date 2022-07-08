@@ -12,6 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -94,14 +95,5 @@ public class BombArrowListener implements Listener {
     }
 
 
-    //Trident thrown event
-    @EventHandler
-    public void onTridentHit(ProjectileHitEvent e) {
-        if(!e.getEntityType().equals(EntityType.TRIDENT)) return;
-        ThrownTrident tridentEntity = ((CraftTrident) e.getEntity()).getHandle();
-        if (e.getEntity().getShooter() instanceof Player && e.getEntityType().equals(EntityType.TRIDENT) && tridentEntity.isChanneling() && !e.getEntity().getWorld().isThundering()) {
-            Player plr = (Player)e.getEntity().getShooter();
-            plr.getWorld().strikeLightning(e.getEntity().getLocation());
-        }
-    }
+
 }
