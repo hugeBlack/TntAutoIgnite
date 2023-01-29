@@ -1,3 +1,6 @@
+tntAutoIgniteEnabled: true
 arrowTntDamageMultiplier: 0.25
 arrowTntCoolDownTicks: 100
 arrowTntFuseTicks: 15
+savingDisabledWorld:
+  - example

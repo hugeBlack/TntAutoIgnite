@@ -29,7 +29,6 @@ public class BombArrowListener implements Listener {
     public HashMap<Entity,Integer> tickMapPlayerCanShoot = new HashMap<>();
     public int totalTick = 0;
     {
-        Bukkit.getLogger().log(Level.WARNING,"Listener attached.");
         BukkitScheduler scheduler = Bukkit.getScheduler();
         scheduler.scheduleSyncRepeatingTask(TntAutoIgnite.thePlugin, () -> {
             totalTick++;

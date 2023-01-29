@@ -17,8 +17,8 @@ public class TntAutoIgniteCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args) {
         if(args[0].equals("reload")){
             TntAutoIgnite.loadConfig();
-            if(sender instanceof Player) sender.sendMessage("§aConfig Reload Completed");
-            if(sender instanceof ConsoleCommandSender) Bukkit.getLogger().log(Level.WARNING,"Config Reloaded.");
+            if(sender instanceof Player) sender.sendMessage("§aConfig Reload Completed1");
+            if(sender instanceof ConsoleCommandSender) Bukkit.getLogger().log(Level.WARNING,"[TAI] Config Reloaded.");
             return true;
         }else{
             return false;

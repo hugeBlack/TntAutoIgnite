@@ -31,11 +31,11 @@ public class PlaceTntListener implements Listener {
                 if (params[0] == Level.class && params[1] == BlockPos.class && params[2] == LivingEntity.class) {
                     tntExplodeMethod = method;
                     tntExplodeMethod.setAccessible(true);
-                    Bukkit.getLogger().log(java.util.logging.Level.INFO, "Explode method found: " + method.toGenericString());
+                    Bukkit.getLogger().log(java.util.logging.Level.INFO, "[TAI] Explode method found: " + method.toGenericString());
                     return;
                 }
             }
-            Bukkit.getLogger().log(java.util.logging.Level.SEVERE, "Explode method not found.");
+            Bukkit.getLogger().log(java.util.logging.Level.SEVERE, "[TAI] Explode method not found.");
             Bukkit.getPluginManager().disablePlugin(TntAutoIgnite.thePlugin);
         } catch (Exception ex) {
             ex.printStackTrace();
