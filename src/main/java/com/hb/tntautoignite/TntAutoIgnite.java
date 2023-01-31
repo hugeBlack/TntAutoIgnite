@@ -1,10 +1,17 @@
 package com.hb.tntautoignite;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
@@ -19,6 +26,7 @@ public final class TntAutoIgnite extends JavaPlugin {
     public void onEnable() {
         thePlugin = this;
         loadConfig();
+        GlowHelper.init();
         if(getConfig().getBoolean("tntAutoIgniteEnabled"))
             Bukkit.getPluginManager().registerEvents(new PlaceTntListener(), this);
 
@@ -56,4 +64,6 @@ public final class TntAutoIgnite extends JavaPlugin {
         arrowTntFuseTicks = thePlugin.getConfig().getInt("arrowTntFuseTicks");
         savingDisabledWorldList = (ArrayList<String>) thePlugin.getConfig().getList("savingDisabledWorld");
     }
+
+
 }
