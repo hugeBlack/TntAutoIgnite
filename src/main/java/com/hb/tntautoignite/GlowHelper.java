@@ -34,7 +34,7 @@ public class GlowHelper {
                 int entityId = packet.getIntegers().read(0);
                 Entity entity = protocolManager.getEntityFromID(player.getWorld(),entityId);
                 if(glowList.contains(entity)){
-                    modifyPacket(packet,entity,true);
+                    modifyPacket(packet,entity,true,false);
                 }
             }
         });
@@ -48,7 +48,7 @@ public class GlowHelper {
         }
         entities.add(player);
         PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
-        modifyPacket(packet,player,true);
+        modifyPacket(packet,player,true,true);
         try {
             protocolManager.sendServerPacket(receiver, packet);
         } catch (InvocationTargetException e) {
@@ -58,19 +58,26 @@ public class GlowHelper {
 
     }
 
-    private static void modifyPacket(PacketContainer packet,Entity playerToGlow,boolean shouldGlow){
+    private static void modifyPacket(PacketContainer packet,Entity playerToGlow,boolean shouldGlow,boolean firstTime){
         packet.getIntegers().write(0, playerToGlow.getEntityId()); //Set packet's entity id
         List<WrappedWatchableObject> metaDataFields = packet.getWatchableCollectionModifier().read(0);
-        WrappedDataWatcher watcher ;
-        if(metaDataFields==null)
-            watcher = new WrappedDataWatcher(); //Create data watcher, the Entity Metadata packet requires this
-        else
+        WrappedDataWatcher watcher;
+        WrappedDataWatcher.Serializer serializer = WrappedDataWatcher.Registry.get(Byte.class);//Found this through google, needed for some stupid reason
+        if(firstTime){
+            watcher = new WrappedDataWatcher();
+            watcher.setEntity(playerToGlow); //Set the new data watcher's target
+            watcher.setObject(0, serializer, (byte)0x40);
+            packet.getWatchableCollectionModifier().write(0, watcher.getWatchableObjects());
+        }else{
+            if(metaDataFields==null) return;
             watcher = new WrappedDataWatcher(metaDataFields);
-        WrappedDataWatcher.Serializer serializer = WrappedDataWatcher.Registry.get(Byte.class); //Found this through google, needed for some stupid reason
-        watcher.setEntity(playerToGlow); //Set the new data watcher's target
-        Byte orgVal = (Byte) watcher.getWatchableObject(0).getValue();
-        byte newVal = (byte) ((orgVal==null?0:orgVal) | (shouldGlow?0x40:0x0));
-        watcher.setObject(0, serializer, newVal); //Set status to glowing, found on protocol page
-        packet.getWatchableCollectionModifier().write(0, watcher.getWatchableObjects()); //Make the packet's datawatcher the one we created
+            WrappedWatchableObject orgValObj = watcher.getWatchableObject(0);
+            if(orgValObj==null) return;
+            Byte orgVal = (Byte) orgValObj.getValue();
+            if(orgVal==null) return;
+            byte newVal = (byte) ((orgVal) | (shouldGlow?0x40:0x0));
+            watcher.setObject(0, serializer, newVal); //Set status to glowing, found on protocol page
+            packet.getWatchableCollectionModifier().write(0, watcher.getWatchableObjects()); //Make the packet's datawatcher the one we created
+        }
     }
 }
