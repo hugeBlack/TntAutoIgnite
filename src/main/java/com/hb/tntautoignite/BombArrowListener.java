@@ -1,25 +1,20 @@
 package com.hb.tntautoignite;
 
-import net.minecraft.world.entity.projectile.ThrownTrident;
+import net.minecraft.nbt.CompoundTag;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftArrow;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftTNTPrimed;
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftTrident;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
-import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 public class BombArrowListener implements Listener {
@@ -37,12 +32,23 @@ public class BombArrowListener implements Listener {
             }
         }, 0L, 1L);
     }
-
     @EventHandler
-    public void onShoot(EntityShootBowEvent e){
+    public void onStraightArrowShoot(EntityShootBowEvent e){
         if(!(e.getEntity() instanceof Player)) return;
-        boolean isLobbyArrow = HBItem.isItem("bomb_arrow_lobby",e.getConsumable());
-        boolean isWarArrow = HBItem.isItem("bomb_arrow",e.getConsumable());
+        boolean isStraightArrow = HBItem.isStraightArrow(e.getConsumable());
+        if(!isStraightArrow) return;
+        e.getProjectile().setGravity(false);
+        //设置速度修正
+        e.getProjectile().setVelocity(e.getProjectile().getVelocity().multiply(TntAutoIgnite.straightArrowVelocityMultiplier));
+        //设置寿命，减小服务器压力
+        net.minecraft.world.entity.projectile.AbstractArrow nmsArrowEntity = ((CraftArrow) e.getProjectile()).getHandle();
+        nmsArrowEntity.life = TntAutoIgnite.straightArrowLiftTickOnShot;
+    }
+    @EventHandler
+    public void onBombArrowShoot(EntityShootBowEvent e){
+        if(!(e.getEntity() instanceof Player)) return;
+        boolean isLobbyArrow = HBItem.isLobbyBombArrow(e.getConsumable());
+        boolean isWarArrow = HBItem.isBombArrow(e.getConsumable());
         if(!isLobbyArrow && !isWarArrow) return;
         Iterator<Map.Entry<Entity,Integer>> it = tickMapPlayerCanShoot.entrySet().iterator();
         while(it.hasNext()){
@@ -51,7 +57,7 @@ public class BombArrowListener implements Listener {
         }
         if(isWarArrow){
             if(tickMapPlayerCanShoot.containsKey(e.getEntity()) && tickMapPlayerCanShoot.get(e.getEntity())>totalTick){
-                ((Player)e.getEntity()).sendMessage("§cTnt Arrow have not cooled down yet. Wait "+((double)(tickMapPlayerCanShoot.get(e.getEntity())-totalTick))/20+"s.");
+                e.getEntity().sendMessage("§cTnt Arrow have not cooled down yet. Wait "+((double)(tickMapPlayerCanShoot.get(e.getEntity())-totalTick))/20+"s.");
                 e.setCancelled(true);
                 ((Player)e.getEntity()).updateInventory();
                 return;
@@ -80,9 +86,9 @@ public class BombArrowListener implements Listener {
         tntSet.add(nmsTNT);
         nmsTNT.setFuseTicks(TntAutoIgnite.arrowTntFuseTicks);
         nmsTNT.setSource(Objects.requireNonNull((Entity)arrow.getShooter()));
-        Iterator it = tntSet.iterator();
+        Iterator<Entity> it = tntSet.iterator();
         while(it.hasNext()){
-            if(((Entity) it.next()).isDead()) it.remove();
+            if(it.next().isDead()) it.remove();
         }
     }
 

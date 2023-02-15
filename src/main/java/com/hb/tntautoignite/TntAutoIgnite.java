@@ -20,13 +20,14 @@ public final class TntAutoIgnite extends JavaPlugin {
     public static double arrowTntDamageMultiplier = 1;
     public static int arrowTntCoolDownTicks = 0;
     public static int arrowTntFuseTicks = 0;
-    public static ArrayList<String> savingDisabledWorldList = null;
+    public static int blockTntFuseTick = 0;
+    public static double straightArrowVelocityMultiplier = 2.0;
+    public static int straightArrowLiftTickOnShot = 0;
 
     @Override
     public void onEnable() {
         thePlugin = this;
         loadConfig();
-        GlowHelper.init();
         if(getConfig().getBoolean("tntAutoIgniteEnabled"))
             Bukkit.getPluginManager().registerEvents(new PlaceTntListener(), this);
 
@@ -34,26 +35,11 @@ public final class TntAutoIgnite extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new MiscellaneousListeners(),this);
         this.getCommand("tai").setExecutor(new TntAutoIgniteCommand());
 
-        //disable saving of specified worlds
-        for(String worldName : savingDisabledWorldList){
-            World world = Bukkit.getWorld(worldName);
-            if(world != null){
-                world.setAutoSave(false);
-            }else{
-                Bukkit.getLogger().log(Level.WARNING, "[TAI] world '"+ worldName + "' does not exist!");
-            }
-        }
     }
 
     @Override
     public void onDisable() {
         Bukkit.getLogger().log(Level.WARNING, "[TAI] bye~");
-        for(String worldName : savingDisabledWorldList){
-            World world = Bukkit.getWorld(worldName);
-            if(world != null){
-                Bukkit.getServer().unloadWorld(world,false);
-            }
-        }
     }
 
     public static void loadConfig(){
@@ -62,7 +48,9 @@ public final class TntAutoIgnite extends JavaPlugin {
         arrowTntCoolDownTicks = thePlugin.getConfig().getInt("arrowTntCoolDownTicks");
         arrowTntDamageMultiplier = thePlugin.getConfig().getDouble("arrowTntDamageMultiplier");
         arrowTntFuseTicks = thePlugin.getConfig().getInt("arrowTntFuseTicks");
-        savingDisabledWorldList = (ArrayList<String>) thePlugin.getConfig().getList("savingDisabledWorld");
+        straightArrowVelocityMultiplier = thePlugin.getConfig().getDouble("straightArrowVelocityMultiplier");
+        blockTntFuseTick = thePlugin.getConfig().getInt("blockTntFuseTick");
+        straightArrowLiftTickOnShot= thePlugin.getConfig().getInt("straightArrowLiftTickOnShot");
     }
 
 

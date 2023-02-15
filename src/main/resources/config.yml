@@ -2,5 +2,6 @@ tntAutoIgniteEnabled: true
 arrowTntDamageMultiplier: 0.25
 arrowTntCoolDownTicks: 100
 arrowTntFuseTicks: 15
-savingDisabledWorld:
-  - example
+straightArrowVelocityMultiplier: 2.0
+blockTntFuseTick: 60
+straightArrowLiftTickOnShot: 800

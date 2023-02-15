@@ -20,33 +20,37 @@ import java.util.List;
 import java.util.logging.Level;
 
 public class GlowHelper {
-    public static HashMap<Player, HashSet<Entity>> playerGlowSet = new HashMap<>();//<Receiver,Set of glowing players ENTITY_ID receiver can see>
+    public static HashMap<String, HashSet<String>> playerGlowSet = new HashMap<>();//<Receiver,Set of glowing players ENTITY_ID receiver can see>
     public static ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
-    public static void init(){
+    static {
         ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
-        protocolManager.addPacketListener(new PacketAdapter(TntAutoIgnite.thePlugin, ListenerPriority.LOWEST,PacketType.Play.Server.ENTITY_METADATA) {
+        protocolManager.addPacketListener(new PacketAdapter(TntAutoIgnite.thePlugin, ListenerPriority.HIGHEST,PacketType.Play.Server.ENTITY_METADATA) {
             @Override
             public void onPacketSending(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
                 Player player = event.getPlayer(); //player who receive
-                HashSet<Entity> glowList = playerGlowSet.get(player);
+                HashSet<String> glowList = playerGlowSet.get(player.getName());
                 if(glowList==null) return;
                 int entityId = packet.getIntegers().read(0);
                 Entity entity = protocolManager.getEntityFromID(player.getWorld(),entityId);
-                if(glowList.contains(entity)){
-                    modifyPacket(packet,entity,true,false);
+                if(!(entity instanceof Player)) return;
+                Player glowPlayer = (Player) entity;
+                if(glowList.contains(glowPlayer.getName())){
+                    modifyPacket(packet,glowPlayer,true,false);
+                }else{
+                    modifyPacket(packet,glowPlayer,false,false);
                 }
             }
         });
     }
 
     public static void setGlowing(Player player, Player receiver) {
-        HashSet<Entity> entities = playerGlowSet.get(receiver);
-        if(entities==null){
-            entities = new HashSet<>();
-            playerGlowSet.put(receiver,entities);
+        HashSet<String> entitiesName = playerGlowSet.get(receiver.getName());
+        if(entitiesName==null){
+            entitiesName = new HashSet<>();
+            playerGlowSet.put(receiver.getName(),entitiesName);
         }
-        entities.add(player);
+        entitiesName.add(player.getName());
         PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
         modifyPacket(packet,player,true,true);
         try {
@@ -54,16 +58,14 @@ public class GlowHelper {
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
-        Bukkit.getLogger().log(Level.INFO,player.getDisplayName()+" -> "+receiver.getDisplayName());
-
     }
 
     private static void modifyPacket(PacketContainer packet,Entity playerToGlow,boolean shouldGlow,boolean firstTime){
-        packet.getIntegers().write(0, playerToGlow.getEntityId()); //Set packet's entity id
         List<WrappedWatchableObject> metaDataFields = packet.getWatchableCollectionModifier().read(0);
         WrappedDataWatcher watcher;
         WrappedDataWatcher.Serializer serializer = WrappedDataWatcher.Registry.get(Byte.class);//Found this through google, needed for some stupid reason
         if(firstTime){
+            packet.getIntegers().write(0, playerToGlow.getEntityId()); //Set packet's entity id
             watcher = new WrappedDataWatcher();
             watcher.setEntity(playerToGlow); //Set the new data watcher's target
             watcher.setObject(0, serializer, (byte)0x40);
@@ -75,7 +77,12 @@ public class GlowHelper {
             if(orgValObj==null) return;
             Byte orgVal = (Byte) orgValObj.getValue();
             if(orgVal==null) return;
-            byte newVal = (byte) ((orgVal) | (shouldGlow?0x40:0x0));
+            byte newVal;
+            if(shouldGlow){
+                newVal = (byte) ((orgVal) | (byte)0x40);
+            }else{
+                newVal = (byte) ((orgVal) & (byte)0xbf);
+            }
             watcher.setObject(0, serializer, newVal); //Set status to glowing, found on protocol page
             packet.getWatchableCollectionModifier().write(0, watcher.getWatchableObjects()); //Make the packet's datawatcher the one we created
         }

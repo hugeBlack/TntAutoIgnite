@@ -8,24 +8,23 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 public class HBItem {
-    public static NamespacedKey ItemKey = null;
-    public static ItemStack getBukkitStack(Material itemType, String hbItemId, int count){
-        ItemStack is =new ItemStack(itemType,count);
-        ItemMeta im = is.getItemMeta();
-        im.getPersistentDataContainer().set(getKey(), PersistentDataType.STRING,hbItemId);
-        is.setItemMeta(im);
-        return is;
-
-    }
-    public static boolean isItem(String id,ItemStack stack){
-        String itemId = stack.getItemMeta().getPersistentDataContainer().get(getKey(),PersistentDataType.STRING);
-        return itemId!=null && itemId.equals(id);
+    private static NamespacedKey lobbyBombArrowKey = new NamespacedKey(TntAutoIgnite.thePlugin,"lobby_bomb_arrow");;
+    private static NamespacedKey bombArrowKey = new NamespacedKey(TntAutoIgnite.thePlugin,"bomb_arrow");
+    private static NamespacedKey straightArrowKey = new NamespacedKey(TntAutoIgnite.thePlugin,"straight_arrow");
+    private static boolean isItem(NamespacedKey namespacedKey,ItemStack stack){
+        ItemMeta im = stack.getItemMeta();
+        if(im==null) return false;
+        Byte isItem = im.getPersistentDataContainer().get(namespacedKey,PersistentDataType.BYTE);
+        return isItem!=null && isItem==1;
     }
 
-    private static NamespacedKey getKey(){
-        if(ItemKey==null){
-            ItemKey = new NamespacedKey(TntAutoIgnite.thePlugin,"ItemId");
-        }
-        return  ItemKey;
+    public static boolean isLobbyBombArrow(ItemStack stack){
+        return isItem(lobbyBombArrowKey,stack);
+    }
+    public static boolean isBombArrow(ItemStack stack){
+        return isItem(bombArrowKey,stack);
+    }
+    public static boolean isStraightArrow(ItemStack stack){
+        return isItem(straightArrowKey,stack);
     }
 }
