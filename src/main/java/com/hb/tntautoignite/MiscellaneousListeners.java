@@ -26,9 +26,8 @@ public class MiscellaneousListeners implements Listener {
     public void onTridentHit(ProjectileHitEvent e) {
         if(!e.getEntityType().equals(EntityType.TRIDENT)) return;
         ThrownTrident tridentEntity = ((CraftTrident) e.getEntity()).getHandle();
-        if (e.getEntity().getShooter() instanceof Player && e.getEntityType().equals(EntityType.TRIDENT) && tridentEntity.isChanneling() && !e.getEntity().getWorld().isThundering()) {
-            Player plr = (Player)e.getEntity().getShooter();
-            plr.getWorld().strikeLightning(e.getEntity().getLocation());
+        if (e.getEntity().getShooter() instanceof Player && tridentEntity.isChanneling() && !e.getEntity().getWorld().isThundering()) {
+            e.getEntity().getWorld().strikeLightning(e.getEntity().getLocation());
         }
     }
 
