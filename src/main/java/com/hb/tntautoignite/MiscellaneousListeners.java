@@ -74,6 +74,7 @@ public class MiscellaneousListeners implements Listener {
 
     @EventHandler
     public void onEntityTargetEntity(EntityTargetLivingEntityEvent e){
+        if(!entityPlayerHashMap.containsKey(e.getEntity())) return;
         Player p =entityPlayerHashMap.get(e.getEntity());
         if(p == e.getTarget() || p == entityPlayerHashMap.get(e.getTarget())) e.setCancelled(true);
     }
