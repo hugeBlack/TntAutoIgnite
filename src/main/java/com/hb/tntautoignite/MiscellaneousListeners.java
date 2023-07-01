@@ -13,6 +13,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -32,6 +33,44 @@ public class MiscellaneousListeners implements Listener {
     }
 
     public HashMap<Entity,Player> entityPlayerHashMap = new HashMap<>();
+
+    @EventHandler
+    public void onPlayerUseSpawnEggOnEntity(PlayerInteractEntityEvent e){
+        ItemStack item = e.getPlayer().getInventory().getItemInMainHand();
+        if(item != null){
+            EntityType newEntityType = null;
+            boolean shouldAddHat = false;
+            switch (item.getType()){
+                case ZOMBIE_SPAWN_EGG:
+                    shouldAddHat = true;
+                    newEntityType = EntityType.ZOMBIE;
+                    break;
+                case SKELETON_SPAWN_EGG:
+                    shouldAddHat = true;
+                    newEntityType = EntityType.SKELETON;
+                    break;
+                case STRAY_SPAWN_EGG:
+                    shouldAddHat = true;
+                    newEntityType = EntityType.STRAY;
+                    break;
+                case CREEPER_SPAWN_EGG:
+                    shouldAddHat = false;
+                    newEntityType = EntityType.CREEPER;
+                    break;
+                case BLAZE_SPAWN_EGG:
+                    shouldAddHat = false;
+                    newEntityType = EntityType.BLAZE;
+                    break;
+            }
+            if(newEntityType == null) return;
+            e.setCancelled(true);
+            if(e.getPlayer().getGameMode() != GameMode.CREATIVE) item.setAmount(item.getAmount()-1);
+            Entity entity = e.getPlayer().getWorld().spawnEntity(e.getRightClicked().getLocation(), newEntityType);
+            ItemStack hatIS = new ItemStack(Material.LEATHER_HELMET);
+            if(shouldAddHat) ((LivingEntity) entity).getEquipment().setHelmet(hatIS);
+            entityPlayerHashMap.put(entity,e.getPlayer());
+        }
+    }
 
     @EventHandler
     public void onUseSpawnEgg(PlayerInteractEvent e){
@@ -70,7 +109,6 @@ public class MiscellaneousListeners implements Listener {
         }
 
     }
-
 
     @EventHandler
     public void onEntityTargetEntity(EntityTargetLivingEntityEvent e){
