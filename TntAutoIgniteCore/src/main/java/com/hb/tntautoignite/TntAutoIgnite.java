@@ -1,18 +1,11 @@
 package com.hb.tntautoignite;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import com.hb.tntautoignite.nms.NMS;
+import com.hb.tntautoignite.nms.NMSUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.logging.Level;
 
 public final class TntAutoIgnite extends JavaPlugin {
@@ -23,6 +16,8 @@ public final class TntAutoIgnite extends JavaPlugin {
     public static int blockTntFuseTick = 0;
     public static double straightArrowVelocityMultiplier = 2.0;
     public static int straightArrowLiftTickOnShot = 0;
+
+    public static NMS nms;
 
     @Override
     public void onEnable() {
@@ -35,6 +30,7 @@ public final class TntAutoIgnite extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new MiscellaneousListeners(),this);
         this.getCommand("tai").setExecutor(new TntAutoIgniteCommand());
 
+        nms = NMSUtil.getNMSInstance();
     }
 
     @Override

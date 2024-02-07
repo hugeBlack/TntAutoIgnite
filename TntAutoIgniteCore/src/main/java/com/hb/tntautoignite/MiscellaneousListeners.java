@@ -1,10 +1,8 @@
 package com.hb.tntautoignite;
 
-import net.minecraft.world.entity.projectile.ThrownTrident;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftTrident;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,8 +24,8 @@ public class MiscellaneousListeners implements Listener {
     @EventHandler
     public void onTridentHit(ProjectileHitEvent e) {
         if(!e.getEntityType().equals(EntityType.TRIDENT)) return;
-        ThrownTrident tridentEntity = ((CraftTrident) e.getEntity()).getHandle();
-        if (e.getEntity().getShooter() instanceof Player && tridentEntity.isChanneling() && !e.getEntity().getWorld().isThundering()) {
+        Trident tridentEntity = (Trident) e.getEntity();
+        if (e.getEntity().getShooter() instanceof Player && TntAutoIgnite.nms.checkTridentChannelling(tridentEntity) && !e.getEntity().getWorld().isThundering()) {
             e.getEntity().getWorld().strikeLightning(e.getEntity().getLocation());
         }
     }

@@ -1,10 +1,7 @@
 package com.hb.tntautoignite;
 
-import net.minecraft.nbt.CompoundTag;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftArrow;
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftTNTPrimed;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -41,8 +38,8 @@ public class BombArrowListener implements Listener {
         //设置速度修正
         e.getProjectile().setVelocity(e.getProjectile().getVelocity().multiply(TntAutoIgnite.straightArrowVelocityMultiplier));
         //设置寿命，减小服务器压力
-        net.minecraft.world.entity.projectile.AbstractArrow nmsArrowEntity = ((CraftArrow) e.getProjectile()).getHandle();
-        nmsArrowEntity.life = TntAutoIgnite.straightArrowLiftTickOnShot;
+        Arrow nmsArrowEntity = (Arrow) e.getProjectile();
+        nmsArrowEntity.setTicksLived(TntAutoIgnite.straightArrowLiftTickOnShot);
     }
     @EventHandler
     public void onBombArrowShoot(EntityShootBowEvent e){
@@ -81,11 +78,8 @@ public class BombArrowListener implements Listener {
 
 
     public void summonTnt(Projectile arrow){
-        Entity newTnt = arrow.getWorld().spawnEntity(arrow.getLocation(), EntityType.PRIMED_TNT);
-        CraftTNTPrimed nmsTNT = (CraftTNTPrimed) newTnt;
-        tntSet.add(nmsTNT);
-        nmsTNT.setFuseTicks(TntAutoIgnite.arrowTntFuseTicks);
-        nmsTNT.setSource(Objects.requireNonNull((Entity)arrow.getShooter()));
+        TntAutoIgnite.nms.summonTnt(arrow.getLocation(), (LivingEntity) arrow.getShooter(), TntAutoIgnite.arrowTntFuseTicks);
+
         Iterator<Entity> it = tntSet.iterator();
         while(it.hasNext()){
             if(it.next().isDead()) it.remove();

@@ -1,7 +1,5 @@
 package com.hb.tntautoignite;
 
-import com.mojang.brigadier.Command;
-import com.mojang.brigadier.context.CommandContext;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -21,7 +19,7 @@ public class TntAutoIgniteCommand implements CommandExecutor {
             if (sender instanceof ConsoleCommandSender) Bukkit.getLogger().log(Level.WARNING, "[TAI] Config Reloaded.");
             return true;
         }else if(args[0].equals("glow")){
-            GlowHelper.setGlowing(Bukkit.getPlayer(args[1]),Bukkit.getPlayer(args[2]));
+            // GlowHelper.setGlowing(Bukkit.getPlayer(args[1]),Bukkit.getPlayer(args[2]));
             return true;
         }else{
             return false;
