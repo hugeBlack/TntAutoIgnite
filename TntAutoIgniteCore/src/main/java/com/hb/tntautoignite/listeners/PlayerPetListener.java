@@ -1,4 +1,4 @@
-package com.hb.tntautoignite;
+package com.hb.tntautoignite.listeners;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -8,27 +8,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
-import java.util.logging.Level;
 
-public class MiscellaneousListeners implements Listener {
-
-    //Trident thrown event
-    @EventHandler
-    public void onTridentHit(ProjectileHitEvent e) {
-        if(!e.getEntityType().equals(EntityType.TRIDENT)) return;
-        Trident tridentEntity = (Trident) e.getEntity();
-        if (e.getEntity().getShooter() instanceof Player && TntAutoIgnite.nms.checkTridentChannelling(tridentEntity) && !e.getEntity().getWorld().isThundering()) {
-            e.getEntity().getWorld().strikeLightning(e.getEntity().getLocation());
-        }
-    }
+public class PlayerPetListener implements Listener {
 
     public HashMap<Entity,Player> entityPlayerHashMap = new HashMap<>();
 

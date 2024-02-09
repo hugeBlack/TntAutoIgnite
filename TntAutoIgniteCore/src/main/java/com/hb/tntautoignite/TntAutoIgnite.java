@@ -1,5 +1,6 @@
 package com.hb.tntautoignite;
 
+import com.hb.tntautoignite.listeners.*;
 import com.hb.tntautoignite.nms.NMS;
 import com.hb.tntautoignite.nms.NMSUtil;
 import org.bukkit.Bukkit;
@@ -27,7 +28,10 @@ public final class TntAutoIgnite extends JavaPlugin {
             Bukkit.getPluginManager().registerEvents(new PlaceTntListener(), this);
 
         Bukkit.getPluginManager().registerEvents(new BombArrowListener(),this);
-        Bukkit.getPluginManager().registerEvents(new MiscellaneousListeners(),this);
+        Bukkit.getPluginManager().registerEvents(new PlayerPetListener(),this);
+        Bukkit.getPluginManager().registerEvents(new TridentListener(), this);
+        Bukkit.getPluginManager().registerEvents(new EnchantmentTableListener(), this);
+
         this.getCommand("tai").setExecutor(new TntAutoIgniteCommand());
 
         nms = NMSUtil.getNMSInstance();

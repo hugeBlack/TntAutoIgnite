@@ -1,5 +1,7 @@
-package com.hb.tntautoignite;
+package com.hb.tntautoignite.listeners;
 
+import com.hb.tntautoignite.HBItem;
+import com.hb.tntautoignite.TntAutoIgnite;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.enchantments.Enchantment;

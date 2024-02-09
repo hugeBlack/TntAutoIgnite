@@ -1,18 +1,12 @@
-package com.hb.tntautoignite;
+package com.hb.tntautoignite.listeners;
 
 
+import com.hb.tntautoignite.TntAutoIgnite;
 import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
-
-import java.util.logging.Level;
 
 
 public class PlaceTntListener implements Listener {
