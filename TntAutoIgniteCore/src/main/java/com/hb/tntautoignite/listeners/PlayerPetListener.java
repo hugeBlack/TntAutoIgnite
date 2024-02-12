@@ -117,7 +117,7 @@ public class PlayerPetListener implements Listener {
                 ((Projectile)e.getDamager()).setShooter(p);
             }else{
                 e.setCancelled(true);
-                EntityDamageByEntityEvent newEvent = new EntityDamageByEntityEvent(p,e.getEntity(),e.getCause(),e.getDamage());
+                EntityDamageByEntityEvent newEvent = new EntityDamageByEntityEvent(p,e.getEntity(),e.getCause(),e.getDamageSource(), e.getDamage());
                 e.getEntity().setLastDamageCause(newEvent);
                 Bukkit.getServer().getPluginManager().callEvent(newEvent);
             }

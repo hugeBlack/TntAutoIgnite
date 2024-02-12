@@ -8,12 +8,14 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import java.util.*;
+import java.util.logging.Level;
 
 
 public class BombArrowListener implements Listener {
@@ -80,12 +82,17 @@ public class BombArrowListener implements Listener {
 
 
     public void summonTnt(Projectile arrow){
-        TntAutoIgnite.nms.summonTnt(arrow.getLocation(), (LivingEntity) arrow.getShooter(), TntAutoIgnite.arrowTntFuseTicks);
+        // TntAutoIgnite.nms.summonTnt(arrow.getLocation(), (LivingEntity) arrow.getShooter(), TntAutoIgnite.arrowTntFuseTicks);
+        TNTPrimed tntEntity = Objects.requireNonNull(arrow.getLocation().getWorld()).spawn(arrow.getLocation(), TNTPrimed.class);
+        tntEntity.setFuseTicks(TntAutoIgnite.arrowTntFuseTicks);
+        tntEntity.setSource((Entity) arrow.getShooter());
 
         Iterator<Entity> it = tntSet.iterator();
         while(it.hasNext()){
             if(it.next().isDead()) it.remove();
         }
+
+        tntSet.add(tntEntity);
     }
 
     @EventHandler
@@ -94,7 +101,5 @@ public class BombArrowListener implements Listener {
             e.setDamage(e.getDamage()*TntAutoIgnite.arrowTntDamageMultiplier);
         }
     }
-
-
 
 }
